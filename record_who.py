@@ -10,28 +10,21 @@ SCRIPT_DIR = os.path.dirname(sys.argv[0])
 sys.path.append(os.path.join(SCRIPT_DIR, 'mcstatus'))
 
 from minecraft_query import MinecraftQuery
-
-DB_FILE = os.path.join(SCRIPT_DIR, 'mc_players.db')
-
-DFLT_PORT = 25565
-QUERY_SERVERS = ( ('server1.com', DFLT_PORT),
-                  ('server1.com', DFLT_PORT),
-                )
-TIMEOUT = 5 
+from query_config import QueryConfig as config
 
 do_db_init = False
-if not os.path.exists(DB_FILE):
+if not os.path.exists(config.db_file):
    do_db_init = True
 
-conn = sqlite3.connect(DB_FILE)
+conn = sqlite3.connect(config.db_file)
 c = conn.cursor()
 
 if do_db_init:
     c.execute('CREATE TABLE players_online (host text,  player_name text, online_at text)')
 
-for host, port in QUERY_SERVERS:
+for host, port in config.servers:
     try:
-        mc_query = MinecraftQuery(host, port, timeout=TIMEOUT)
+        mc_query = MinecraftQuery(host, port, timeout=config.timeout)
 
         server_data = mc_query.get_rules()
 
